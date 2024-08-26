@@ -21,43 +21,30 @@
 ########################################################################
 # Check if there is C++ code at all
 ########################################################################
-if(NOT grgsm_sources)
-    MESSAGE(STATUS "No C++ sources... skipping swig/")
-    return()
-endif(NOT grgsm_sources)
+# Ensure SWIG and Python are found
+find_package(SWIG REQUIRED)
+find_package(PythonLibs REQUIRED)
 
-########################################################################
-# Include swig generation macros
-########################################################################
-find_package(SWIG)
-find_package(PythonLibs)
-if(NOT SWIG_FOUND OR NOT PYTHONLIBS_FOUND)
-    return()
-endif()
-include(GrSwig)
+include(${CMAKE_CURRENT_SOURCE_DIR}/path/to/GrSwig.cmake)
+
+# Proceed with SWIG configuration
 include(GrPython)
 
-########################################################################
-# Setup swig generation
-########################################################################
 set(GR_SWIG_INCLUDE_DIRS $<TARGET_PROPERTY:gnuradio::runtime_swig,INTERFACE_INCLUDE_DIRECTORIES>)
 set(GR_SWIG_TARGET_DEPS gnuradio::runtime_swig)
-
 set(GR_SWIG_LIBRARIES grgsm)
 
 set(GR_SWIG_DOC_FILE ${CMAKE_CURRENT_BINARY_DIR}/grgsm_swig_doc.i)
 set(GR_SWIG_DOC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
+# Manual SWIG command example if needed
+# swig -python -o ${CMAKE_CURRENT_BINARY_DIR}/grgsm_swig_wrap.cxx -I${GR_SWIG_INCLUDE_DIRS} grgsm_swig.i
+
 GR_SWIG_MAKE(grgsm_swig grgsm_swig.i)
 
-########################################################################
-# Install the build swig module
-########################################################################
+# Install targets
 GR_SWIG_INSTALL(TARGETS grgsm_swig DESTINATION ${GR_PYTHON_DIR}/grgsm)
 
-########################################################################
-# Install swig .i files for development
-########################################################################
 install(
     FILES
     grgsm_swig.i
